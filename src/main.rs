@@ -23,7 +23,7 @@ struct CspReportContent {
     /// Either "enforce" or "report" depending on whether the
     /// Content-Security-Policy-Report-Only header or
     /// the Content-Security-Policy header is used.
-    disposition: String,
+    disposition: Option<String>,
 
     /// The URI of the document in which the violation occurred.
     #[serde(alias = "document-uri")]
@@ -34,7 +34,7 @@ struct CspReportContent {
     /// style-src-elem/style-src-attr, even when the actual enforced directive
     /// was style-src.
     #[serde(alias = "effective-directive")]
-    effective_directive: String,
+    effective_directive: Option<String>,
 
     /// The original policy as specified by the Content-Security-Policy
     /// HTTP header.
@@ -48,12 +48,12 @@ struct CspReportContent {
     /// style that caused the violation. Only applicable to script-src*
     /// and style-src* violations, when they contain the 'report-sample'
     #[serde(alias = "script-sample")]
-    script_sample: String,
+    script_sample: Option<String>,
 
     /// The HTTP status code of the resource on which the global object
     /// was instantiated.
     #[serde(alias = "status-code")]
-    status_code: String,
+    status_code: Option<String>,
 
     /// The name of the policy section that was violated.
     #[serde(alias = "violated-directive")]
