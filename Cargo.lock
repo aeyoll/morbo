@@ -542,6 +542,7 @@ version = "0.1.0"
 dependencies = [
  "async-std",
  "serde",
+ "serde_json",
  "tide",
 ]
 

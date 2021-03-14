@@ -1,4 +1,3 @@
-use std::fmt;
 use tide::prelude::*;
 use tide::Request;
 
@@ -8,7 +7,7 @@ struct CspReport {
     pub csp_report: CspReportContent,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct CspReportContent {
     /// The URI of the resource that was blocked from loading by the
     /// Content Security Policy. If the blocked URI is from a different
@@ -49,22 +48,12 @@ struct CspReportContent {
 
     /// The HTTP status code of the resource on which the global object
     /// was instantiated.
-    #[serde(alias = "status_code")]
+    #[serde(alias = "status-code")]
     status_code: String,
 
     /// The name of the policy section that was violated.
     #[serde(alias = "violated-directive")]
     violated_directive: String,
-}
-
-impl fmt::Display for CspReportContent {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "document_uri: \"{}\", referrer: \"{}\", blocked_uri: \"{}\", violated_directive: \"{}\", original_policy: \"{}\"",
-            self.document_uri, self.referrer, self.blocked_uri, self.violated_directive, self.original_policy
-        )
-    }
 }
 
 #[async_std::main]
@@ -77,5 +66,5 @@ async fn main() -> tide::Result<()> {
 
 async fn csp_report(mut req: Request<()>) -> tide::Result {
     let CspReport { csp_report } = req.body_json().await?;
-    Ok(format!("CSP report: {}", csp_report).into())
+    Ok(format!("CSP report: {}", serde_json::to_string_pretty(&csp_report).unwrap()).into())
 }
