@@ -1,6 +1,10 @@
 use tide::prelude::*;
 use tide::Request;
 
+#[macro_use]
+extern crate clap;
+use clap::App;
+
 #[derive(Debug, Deserialize)]
 struct CspReport {
     #[serde(alias = "csp-report")]
@@ -58,9 +62,16 @@ struct CspReportContent {
 
 #[async_std::main]
 async fn main() -> tide::Result<()> {
+    let yaml = load_yaml!("cli.yml");
+    let matches = App::from_yaml(yaml).get_matches();
+
+    let port = matches.value_of("port").unwrap_or("8080");
+    let binding = format!("127.0.0.1:{}", port);
+    println!("Launching server on {}", binding);
+
     let mut app = tide::new();
     app.at("/_/csp-reports").post(csp_report);
-    app.listen("127.0.0.1:8080").await?;
+    app.listen(&binding).await?;
     Ok(())
 }
 

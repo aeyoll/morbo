@@ -1,0 +1,11 @@
+name: cspreport
+version: "0.1.0"
+author: Jean-Philippe Bidegain <jp@bidega.in>
+about: Does awesome things
+args:
+    - port:
+        short: p
+        long: port
+        value_name: PORT
+        help: Running port
+        takes_value: true
