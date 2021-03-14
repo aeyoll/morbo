@@ -1,0 +1,10 @@
+[package]
+name = "cspreport"
+version = "0.1.0"
+authors = ["Jean-Philippe Bidegain <jp@bidega.in>"]
+edition = "2018"
+
+[dependencies]
+tide = "0.16.0"
+async-std = { version = "1.8.0", features = ["attributes"] }
+serde = { version = "1.0", features = ["derive"] }
