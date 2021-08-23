@@ -5,6 +5,19 @@ use tide::Request;
 extern crate clap;
 use clap::App;
 
+extern crate lettre;
+extern crate lettre_email;
+
+use lettre::smtp::authentication::{Credentials, Mechanism};
+use lettre::smtp::response::Response as LettreResponse;
+use lettre::smtp::error::Error as LettreError;
+use lettre::{SmtpClient, Transport};
+use lettre_email::EmailBuilder;
+
+extern crate dotenv;
+use dotenv::dotenv;
+use std::env;
+
 #[derive(Debug, Deserialize)]
 struct CspReport {
     #[serde(alias = "csp-report")]
@@ -60,8 +73,72 @@ struct CspReportContent {
     violated_directive: String,
 }
 
+impl CspReportContent {
+    fn send_email(&self, mail_configuration: MailConfiguration) -> Result<LettreResponse, LettreError> {
+        let email = EmailBuilder::new()
+            .from(("csr@example.org", "CSP Report"))
+            .to((
+                &mail_configuration.to_email,
+                &mail_configuration.to_name,
+            ))
+            .subject("[CSP] New report")
+            .body(format!(
+                "New report {}",
+                serde_json::to_string_pretty(self).unwrap()
+            ))
+            .build()
+            .unwrap();
+
+        let credentials = Credentials::new(
+            mail_configuration.smtp_username.to_owned(),
+            mail_configuration.smtp_password.to_owned(),
+        );
+        let mut mailer = SmtpClient::new_simple(&mail_configuration.smtp_server)
+            .unwrap()
+            // Add credentials for authentication
+            .credentials(credentials)
+            // Configure expected authentication mechanism
+            .authentication_mechanism(Mechanism::Plain)
+            .transport();
+
+        // Send the email
+        mailer.send(email.into())
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct MailConfiguration {
+    to_name: String,
+    to_email: String,
+    smtp_server: String,
+    smtp_username: String,
+    smtp_password: String,
+}
+
+impl MailConfiguration {
+    pub fn new(
+        to_name: String,
+        to_email: String,
+        smtp_server: String,
+        smtp_username: String,
+        smtp_password: String,
+    ) -> Self {
+        MailConfiguration {
+            to_name,
+            to_email,
+            smtp_server,
+            smtp_username,
+            smtp_password,
+        }
+    }
+}
+
 #[async_std::main]
 async fn main() -> tide::Result<()> {
+    // Load env variables
+    dotenv().ok();
+
+    // Cli args
     let yaml = load_yaml!("cli.yml");
     let matches = App::from_yaml(yaml).get_matches();
 
@@ -70,12 +147,23 @@ async fn main() -> tide::Result<()> {
     println!("Launching server on {}", binding);
 
     let mut app = tide::new();
-    app.at("/_/csp-reports").post(csp_report);
+    app.at("/_/csp-reports").post(csp_report_action);
     app.listen(&binding).await?;
     Ok(())
 }
 
-async fn csp_report(mut req: Request<()>) -> tide::Result {
+async fn csp_report_action(mut req: Request<()>) -> tide::Result {
     let CspReport { csp_report } = req.body_json().await?;
+
+    let mail_configuration = MailConfiguration::new(
+        env::var("TO_NAME").unwrap(),
+        env::var("TO_EMAIL").unwrap(),
+        env::var("SMTP_SERVER").unwrap(),
+        env::var("SMTP_USERNAME").unwrap(),
+        env::var("SMTP_PASSWORD").unwrap(),
+    );
+
+    csp_report.send_email(mail_configuration).unwrap();
+
     Ok(format!("CSP report: {}", serde_json::to_string_pretty(&csp_report).unwrap()).into())
 }
