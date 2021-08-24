@@ -6,10 +6,12 @@ use clap::App;
 
 mod csp_report;
 mod csp_report_content;
-mod mail_configuration;
+mod mailer;
+mod mailer_configuration;
 
 use crate::csp_report::CspReport;
-use crate::mail_configuration::MailConfiguration;
+use crate::mailer::Mailer;
+use crate::mailer_configuration::MailerConfiguration;
 
 extern crate lettre;
 extern crate lettre_email;
@@ -42,21 +44,24 @@ async fn csp_report_action(mut req: Request<()>) -> tide::Result {
 
     let to_name = env::var("TO_NAME").unwrap();
     let to_email = env::var("TO_EMAIL").unwrap();
+
     let smtp_hostname = env::var("SMTP_HOSTNAME").unwrap();
     let smtp_port = env::var("SMTP_PORT").unwrap().parse().unwrap();
     let smtp_username = env::var("SMTP_USERNAME").unwrap();
     let smtp_password = env::var("SMTP_PASSWORD").unwrap();
 
-    let mail_configuration = MailConfiguration {
-        to_name,
-        to_email,
+    let mailer_configuration = MailerConfiguration {
         smtp_hostname,
         smtp_port,
         smtp_username: Some(smtp_username),
         smtp_password: Some(smtp_password),
     };
 
-    csp_report.send_email(&mail_configuration).unwrap();
+    let mailer = Mailer {
+        configuration: mailer_configuration,
+    };
+
+    let _res = csp_report.send_email(&mailer, &to_email, &to_name)?;
 
     Ok(format!(
         "CSP report: {}",

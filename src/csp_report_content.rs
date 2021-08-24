@@ -1,10 +1,9 @@
 use tide::prelude::*;
 
-use crate::mail_configuration::MailConfiguration;
-use lettre::smtp::authentication::{Credentials, Mechanism};
-use lettre::smtp::error::Error as LettreError;
-use lettre::smtp::response::Response as LettreResponse;
-use lettre::{ClientSecurity, SmtpClient, Transport};
+use crate::mailer::Mailer;
+use anyhow::Error;
+use lettre::smtp::error::SmtpResult;
+use lettre::Transport;
 use lettre_email::EmailBuilder;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -59,11 +58,13 @@ pub struct CspReportContent {
 impl CspReportContent {
     pub fn send_email(
         &self,
-        mail_configuration: &MailConfiguration,
-    ) -> Result<LettreResponse, LettreError> {
+        mailer: &Mailer,
+        to_email: &str,
+        to_name: &str,
+    ) -> Result<SmtpResult, Error> {
         let email = EmailBuilder::new()
             .from(("csp@example.org", "CSP Report"))
-            .to((&mail_configuration.to_email, &mail_configuration.to_name))
+            .to((to_email, to_name))
             .subject("[CSP] New report")
             .body(format!(
                 "New report {}",
@@ -72,27 +73,7 @@ impl CspReportContent {
             .build()
             .unwrap();
 
-        // let mut mailer = SmtpClient::new(("localhost", 1025), ClientSecurity::None)?.transport();
-        let addr = (
-            mail_configuration.smtp_hostname.as_str(),
-            mail_configuration.smtp_port,
-        );
-        let security = ClientSecurity::None;
-
-        let mut mailer = SmtpClient::new(addr, security)?;
-
-        if mail_configuration.smtp_username.is_some() && mail_configuration.smtp_password.is_some() {
-            let credentials = Credentials::new(
-                mail_configuration.smtp_username.as_ref().unwrap().to_owned(),
-                mail_configuration.smtp_password.as_ref().unwrap().to_owned(),
-            );
-
-            mailer = mailer
-                .credentials(credentials)
-                .authentication_mechanism(Mechanism::Plain);
-        }
-
-        let mut transport = mailer.transport();
-        transport.send(email.into())
+        let mut transport = mailer.get_transport().unwrap();
+        Ok(transport.send(email.into()))
     }
 }

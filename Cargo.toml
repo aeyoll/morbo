@@ -13,3 +13,4 @@ clap = {version = "2.33", features = ["yaml"]}
 lettre = "0.9"
 lettre_email = "0.9"
 dotenv = "0.15.0"
+anyhow = "1.0"
