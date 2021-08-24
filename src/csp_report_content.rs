@@ -4,7 +4,7 @@ use crate::mail_configuration::MailConfiguration;
 use lettre::smtp::authentication::{Credentials, Mechanism};
 use lettre::smtp::error::Error as LettreError;
 use lettre::smtp::response::Response as LettreResponse;
-use lettre::{SmtpClient, Transport};
+use lettre::{ClientSecurity, SmtpClient, Transport};
 use lettre_email::EmailBuilder;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -62,7 +62,7 @@ impl CspReportContent {
         mail_configuration: &MailConfiguration,
     ) -> Result<LettreResponse, LettreError> {
         let email = EmailBuilder::new()
-            .from(("csr@example.org", "CSP Report"))
+            .from(("csp@example.org", "CSP Report"))
             .to((&mail_configuration.to_email, &mail_configuration.to_name))
             .subject("[CSP] New report")
             .body(format!(
@@ -72,19 +72,27 @@ impl CspReportContent {
             .build()
             .unwrap();
 
-        let credentials = Credentials::new(
-            mail_configuration.smtp_username.to_owned(),
-            mail_configuration.smtp_password.to_owned(),
+        // let mut mailer = SmtpClient::new(("localhost", 1025), ClientSecurity::None)?.transport();
+        let addr = (
+            mail_configuration.smtp_hostname.as_str(),
+            mail_configuration.smtp_port,
         );
-        let mut mailer = SmtpClient::new_simple(&mail_configuration.smtp_server)
-            .unwrap()
-            // Add credentials for authentication
-            .credentials(credentials)
-            // Configure expected authentication mechanism
-            .authentication_mechanism(Mechanism::Plain)
-            .transport();
+        let security = ClientSecurity::None;
 
-        // Send the email
-        mailer.send(email.into())
+        let mut mailer = SmtpClient::new(addr, security)?;
+
+        if mail_configuration.smtp_username.is_some() && mail_configuration.smtp_password.is_some() {
+            let credentials = Credentials::new(
+                mail_configuration.smtp_username.as_ref().unwrap().to_owned(),
+                mail_configuration.smtp_password.as_ref().unwrap().to_owned(),
+            );
+
+            mailer = mailer
+                .credentials(credentials)
+                .authentication_mechanism(Mechanism::Plain);
+        }
+
+        let mut transport = mailer.transport();
+        transport.send(email.into())
     }
 }
