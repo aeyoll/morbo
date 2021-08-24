@@ -1,5 +1,12 @@
 use tide::prelude::*;
 
+use lettre::smtp::authentication::{Credentials, Mechanism};
+use lettre::smtp::response::Response as LettreResponse;
+use lettre::smtp::error::Error as LettreError;
+use lettre::{SmtpClient, Transport};
+use lettre_email::EmailBuilder;
+use crate::mail_configuration::MailConfiguration;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CspReportContent {
     /// The URI of the resource that was blocked from loading by the
@@ -47,4 +54,37 @@ pub struct CspReportContent {
     /// The name of the policy section that was violated.
     #[serde(alias = "violated-directive")]
     violated_directive: String,
+}
+
+impl CspReportContent {
+    pub fn send_email(&self, mail_configuration: &MailConfiguration) -> Result<LettreResponse, LettreError> {
+        let email = EmailBuilder::new()
+            .from(("csr@example.org", "CSP Report"))
+            .to((
+                &mail_configuration.to_email,
+                &mail_configuration.to_name,
+            ))
+            .subject("[CSP] New report")
+            .body(format!(
+                "New report {}",
+                serde_json::to_string_pretty(self).unwrap()
+            ))
+            .build()
+            .unwrap();
+
+        let credentials = Credentials::new(
+            mail_configuration.smtp_username.to_owned(),
+            mail_configuration.smtp_password.to_owned(),
+        );
+        let mut mailer = SmtpClient::new_simple(&mail_configuration.smtp_server)
+            .unwrap()
+            // Add credentials for authentication
+            .credentials(credentials)
+            // Configure expected authentication mechanism
+            .authentication_mechanism(Mechanism::Plain)
+            .transport();
+
+        // Send the email
+        mailer.send(email.into())
+    }
 }
