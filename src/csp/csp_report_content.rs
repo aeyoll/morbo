@@ -1,11 +1,5 @@
 use tide::prelude::*;
 
-use crate::lib::mailer::Mailer;
-use anyhow::Error;
-use lettre::smtp::error::SmtpResult;
-use lettre::Transport;
-use lettre_email::EmailBuilder;
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CspReportContent {
     /// The URI of the resource that was blocked from loading by the
@@ -53,27 +47,4 @@ pub struct CspReportContent {
     /// The name of the policy section that was violated.
     #[serde(alias = "violated-directive")]
     violated_directive: String,
-}
-
-impl CspReportContent {
-    pub fn send_email(
-        &self,
-        mailer: &Mailer,
-        to_email: &str,
-        to_name: &str,
-    ) -> Result<SmtpResult, Error> {
-        let email = EmailBuilder::new()
-            .from(("csp@example.org", "CSP Report"))
-            .to((to_email, to_name))
-            .subject("[CSP] New report")
-            .body(format!(
-                "New report {}",
-                serde_json::to_string_pretty(self).unwrap()
-            ))
-            .build()
-            .unwrap();
-
-        let mut transport = mailer.get_transport().unwrap();
-        Ok(transport.send(email.into()))
-    }
 }

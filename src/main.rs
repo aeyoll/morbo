@@ -4,15 +4,16 @@ use tide::Request;
 extern crate clap;
 use clap::App;
 
-pub mod lib;
+pub mod csp;
+pub mod mailer;
 
 extern crate dotenv;
 use dotenv::dotenv;
 use std::env;
 
-use crate::lib::csp_report::CspReport;
-use crate::lib::mailer::Mailer;
-use crate::lib::mailer_configuration::MailerConfiguration;
+use crate::csp::csp_report::CspReport;
+use crate::mailer::mailer::Mailer;
+use crate::mailer::mailer_configuration::MailerConfiguration;
 
 #[async_std::main]
 async fn main() -> tide::Result<()> {
@@ -55,7 +56,7 @@ async fn csp_report_action(mut req: Request<()>) -> tide::Result {
         configuration: mailer_configuration,
     };
 
-    let _res = csp_report.send_email(&mailer, &to_email, &to_name)?;
+    let _res = mailer.send_report(&csp_report, &to_email, &to_name)?;
 
     Ok(format!(
         "CSP report: {}",

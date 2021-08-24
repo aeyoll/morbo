@@ -1,4 +1,4 @@
-use crate::lib::csp_report_content::CspReportContent;
+use crate::csp::csp_report_content::CspReportContent;
 use tide::prelude::*;
 
 #[derive(Debug, Deserialize)]

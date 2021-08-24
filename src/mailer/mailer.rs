@@ -1,7 +1,12 @@
-use crate::lib::mailer_configuration::MailerConfiguration;
+use crate::csp::csp_report_content::CspReportContent;
+use crate::mailer::mailer_configuration::MailerConfiguration;
 use anyhow::Error;
 use lettre::smtp::authentication::{Credentials, Mechanism};
+use lettre::smtp::error::SmtpResult;
 use lettre::{ClientSecurity, SmtpClient, SmtpTransport};
+use lettre_email::EmailBuilder;
+
+use lettre::Transport;
 
 pub struct Mailer {
     pub configuration: MailerConfiguration,
@@ -39,5 +44,26 @@ impl Mailer {
 
         let transport = smtp_client.transport();
         Ok(transport)
+    }
+
+    pub fn send_report(
+        &self,
+        report: &CspReportContent,
+        to_email: &str,
+        to_name: &str,
+    ) -> Result<SmtpResult, Error> {
+        let email = EmailBuilder::new()
+            .from(("csp@example.org", "CSP Report"))
+            .to((to_email, to_name))
+            .subject("[CSP] New report")
+            .body(format!(
+                "New report {}",
+                serde_json::to_string_pretty(report).unwrap()
+            ))
+            .build()
+            .unwrap();
+
+        let mut transport = self.get_transport().unwrap();
+        Ok(transport.send(email.into()))
     }
 }
