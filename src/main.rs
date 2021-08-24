@@ -4,21 +4,15 @@ use tide::Request;
 extern crate clap;
 use clap::App;
 
-mod csp_report;
-mod csp_report_content;
-mod mailer;
-mod mailer_configuration;
-
-use crate::csp_report::CspReport;
-use crate::mailer::Mailer;
-use crate::mailer_configuration::MailerConfiguration;
-
-extern crate lettre;
-extern crate lettre_email;
+pub mod lib;
 
 extern crate dotenv;
 use dotenv::dotenv;
 use std::env;
+
+use crate::lib::csp_report::CspReport;
+use crate::lib::mailer::Mailer;
+use crate::lib::mailer_configuration::MailerConfiguration;
 
 #[async_std::main]
 async fn main() -> tide::Result<()> {

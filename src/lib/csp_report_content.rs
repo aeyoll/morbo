@@ -1,6 +1,6 @@
 use tide::prelude::*;
 
-use crate::mailer::Mailer;
+use crate::lib::mailer::Mailer;
 use anyhow::Error;
 use lettre::smtp::error::SmtpResult;
 use lettre::Transport;

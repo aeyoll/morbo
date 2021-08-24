@@ -1,4 +1,4 @@
-use crate::mailer_configuration::MailerConfiguration;
+use crate::lib::mailer_configuration::MailerConfiguration;
 use anyhow::Error;
 use lettre::smtp::authentication::{Credentials, Mechanism};
 use lettre::{ClientSecurity, SmtpClient, SmtpTransport};
