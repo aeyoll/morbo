@@ -1,11 +1,11 @@
 use tide::prelude::*;
 
+use crate::mail_configuration::MailConfiguration;
 use lettre::smtp::authentication::{Credentials, Mechanism};
-use lettre::smtp::response::Response as LettreResponse;
 use lettre::smtp::error::Error as LettreError;
+use lettre::smtp::response::Response as LettreResponse;
 use lettre::{SmtpClient, Transport};
 use lettre_email::EmailBuilder;
-use crate::mail_configuration::MailConfiguration;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CspReportContent {
@@ -57,13 +57,13 @@ pub struct CspReportContent {
 }
 
 impl CspReportContent {
-    pub fn send_email(&self, mail_configuration: &MailConfiguration) -> Result<LettreResponse, LettreError> {
+    pub fn send_email(
+        &self,
+        mail_configuration: &MailConfiguration,
+    ) -> Result<LettreResponse, LettreError> {
         let email = EmailBuilder::new()
             .from(("csr@example.org", "CSP Report"))
-            .to((
-                &mail_configuration.to_email,
-                &mail_configuration.to_name,
-            ))
+            .to((&mail_configuration.to_email, &mail_configuration.to_name))
             .subject("[CSP] New report")
             .body(format!(
                 "New report {}",

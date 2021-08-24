@@ -50,5 +50,9 @@ async fn csp_report_action(mut req: Request<()>) -> tide::Result {
 
     csp_report.send_email(&mail_configuration).unwrap();
 
-    Ok(format!("CSP report: {}", serde_json::to_string_pretty(&csp_report).unwrap()).into())
+    Ok(format!(
+        "CSP report: {}",
+        serde_json::to_string_pretty(&csp_report).unwrap()
+    )
+    .into())
 }
