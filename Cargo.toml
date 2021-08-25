@@ -6,6 +6,7 @@ edition = "2018"
 description = "A CSP Reporter"
 license = "MIT"
 homepage= "https://github.com/aeyoll/morbo"
+exclude = [".github"]
 
 [dependencies]
 tide = "0.16.0"
