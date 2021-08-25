@@ -1,5 +1,10 @@
 use tide::prelude::*;
 
+use crate::csp::filter::{
+    BLOCKED_URI_FILTERS, ORIGINAL_POLICY_FILTERS, REFERRER_FILTERS, SCRIPT_SAMPLE_FILTERS,
+    SOURCE_FILE_FILTERS,
+};
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CspReportContent {
     /// The URI of the resource that was blocked from loading by the
@@ -51,4 +56,49 @@ pub struct CspReportContent {
     /// The name of the policy section that was violated.
     #[serde(alias = "violated-directive")]
     pub violated_directive: String,
+}
+
+impl CspReportContent {
+    fn is_in_blocked_uri_filters(&self) -> bool {
+        BLOCKED_URI_FILTERS
+            .into_iter()
+            .find(|&&x| x == self.blocked_uri)
+            .is_some()
+    }
+
+    fn is_in_original_policy_filters(&self) -> bool {
+        ORIGINAL_POLICY_FILTERS
+            .into_iter()
+            .find(|&&x| x == self.original_policy)
+            .is_some()
+    }
+
+    fn is_in_referrer_filters(&self) -> bool {
+        REFERRER_FILTERS
+            .into_iter()
+            .find(|&&x| x == self.referrer)
+            .is_some()
+    }
+
+    fn is_in_script_sample_filters(&self) -> bool {
+        SCRIPT_SAMPLE_FILTERS
+            .into_iter()
+            .find(|&&x| self.script_sample.is_some() && x == self.script_sample.as_ref().unwrap())
+            .is_some()
+    }
+
+    fn is_in_source_file_filters(&self) -> bool {
+        SOURCE_FILE_FILTERS
+            .into_iter()
+            .find(|&&x| self.source_file.is_some() && x == self.source_file.as_ref().unwrap())
+            .is_some()
+    }
+
+    pub fn is_in_block_list(&self) -> bool {
+        self.is_in_blocked_uri_filters()
+            || self.is_in_original_policy_filters()
+            || self.is_in_referrer_filters()
+            || self.is_in_script_sample_filters()
+            || self.is_in_source_file_filters()
+    }
 }
