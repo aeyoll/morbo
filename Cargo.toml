@@ -3,6 +3,9 @@ name = "morbo"
 version = "0.1.0"
 authors = ["Jean-Philippe Bidegain <jp@bidega.in>"]
 edition = "2018"
+description = "A CSP Reporter"
+licence = "MIT"
+homepage= "https://github.com/aeyoll/morbo"
 
 [dependencies]
 tide = "0.16.0"
