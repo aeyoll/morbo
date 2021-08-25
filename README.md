@@ -2,9 +2,9 @@
 
 ![Morbo, a CSP Reporter](https://github.com/aeyoll/morbo/blob/main/.github/logo.jpg?raw=true)
 
-The deprecated HTTP Content-Security-Policy (CSP) `report-uri` and the new HTTP Content-Security-Policy `report-to`  response header directive instructs the user agent to report attempts to violate the Content Security Policy. These violation reports consist of JSON documents sent via an HTTP POST request to the specified URI.
+The HTTP Content-Security-Policy `report-to` (and the deprecated `report-uri`) response header directive instructs the user agent to report attempts to violate the Content Security Policy. These violation reports consist of JSON documents sent via an HTTP POST request to the specified URI.
 
-This Rust crate is an endpoint to receive those reports and send theme to an email address.
+This Rust crate is an endpoint to receive those reports and send them to an email address.
 
 Install
 ---
