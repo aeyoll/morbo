@@ -12,6 +12,10 @@ use dotenv::dotenv;
 use std::env;
 
 use crate::csp::csp_report::CspReport;
+use crate::csp::filter::{
+    BLOCKED_URI_FILTERS, ORIGINAL_POLICY_FILTERS, REFERRER_FILTERS, SCRIPT_SAMPLE_FILTERS,
+    SOURCE_FILE_FILTERS,
+};
 use crate::mailer::mailer::Mailer;
 use crate::mailer::mailer_configuration::MailerConfiguration;
 
@@ -36,6 +40,45 @@ async fn main() -> tide::Result<()> {
 
 async fn csp_report_action(mut req: Request<()>) -> tide::Result {
     let CspReport { csp_report } = req.body_json().await?;
+
+    if BLOCKED_URI_FILTERS
+        .into_iter()
+        .find(|&&x| x == csp_report.blocked_uri)
+        .is_some()
+    {}
+
+    if ORIGINAL_POLICY_FILTERS
+        .into_iter()
+        .find(|&&x| x == csp_report.original_policy)
+        .is_some()
+    {}
+
+    if REFERRER_FILTERS
+        .into_iter()
+        .find(|&&x| x == csp_report.referrer)
+        .is_some()
+    {}
+
+    if SCRIPT_SAMPLE_FILTERS
+        .into_iter()
+        .find(|&&x| {
+            csp_report.script_sample.is_some() && x == csp_report.script_sample.as_ref().unwrap()
+        })
+        .is_some()
+    {}
+
+    if SOURCE_FILE_FILTERS
+        .into_iter()
+        .find(|&&x| {
+            csp_report.source_file.is_some() && x == csp_report.source_file.as_ref().unwrap()
+        })
+        .is_some()
+    {}
+
+    // ORIGINAL_POLICY_FILTERS
+    // REFERRER_FILTERS
+    // SCRIPT_SAMPLE_FILTERS
+    // SOURCE_FILE_FILTERS
 
     let to_name = env::var("TO_NAME").unwrap();
     let to_email = env::var("TO_EMAIL").unwrap();
