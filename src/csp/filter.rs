@@ -1,3 +1,7 @@
+/// Init some filters from some of the report you might receive.
+/// This is basically false positives, or browser extension causing some trouble.
+/// Shamelessly taken from (https://github.com/nico3333fr/CSP-useful/tree/master/csp-wtf)[https://github.com/nico3333fr/CSP-useful/tree/master/csp-wtf]
+
 pub const SOURCE_FILE_FILTERS: &[&str] = &[
     "chromenull://",
     "resource://",
