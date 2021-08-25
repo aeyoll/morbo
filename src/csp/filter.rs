@@ -1,38 +1,3 @@
-use std::fmt;
-use std::str::FromStr;
-
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub enum FilterCategory {
-    SourceFile,
-    BlockedUri,
-    ScriptSample,
-    Referrer,
-    DocumentUri,
-    OriginalPolicy,
-}
-
-impl FromStr for FilterCategory {
-    type Err = &'static str;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "source_file" => Ok(FilterCategory::SourceFile),
-            "blocked_uri" => Ok(FilterCategory::BlockedUri),
-            "script_sample" => Ok(FilterCategory::ScriptSample),
-            "referrer" => Ok(FilterCategory::Referrer),
-            "document_uri" => Ok(FilterCategory::DocumentUri),
-            "original_policty" => Ok(FilterCategory::OriginalPolicy),
-            _ => Err("Unknown FilterCategory (available values: source_file, blocked_uri, script_sample, referrer, document_uri, original_policty)"),
-        }
-    }
-}
-
-impl fmt::Display for FilterCategory {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
 pub const SOURCE_FILE_FILTERS: &[&str] = &[
     "chromenull://",
     "resource://",
