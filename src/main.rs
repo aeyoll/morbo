@@ -1,3 +1,4 @@
+use tide::security::{CorsMiddleware, Origin};
 use tide::Request;
 
 #[macro_use]
@@ -33,6 +34,17 @@ async fn main() -> tide::Result<()> {
     println!("Launching server on {}", binding);
 
     let mut app = tide::new();
+
+    let cors = CorsMiddleware::new()
+        .allow_methods(
+            "GET, POST, PUT, OPTIONS"
+                .parse::<tide::http::headers::HeaderValue>()
+                .unwrap(),
+        )
+        .allow_origin(Origin::from("*"))
+        .allow_credentials(false);
+    app.with(cors);
+
     app.at("/_/csp-reports").post(csp_report_action);
     app.listen(&binding).await?;
     Ok(())
