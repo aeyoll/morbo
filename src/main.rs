@@ -50,13 +50,13 @@ async fn csp_report_action(mut req: Request<()>) -> tide::Result {
     let CspReport { csp_report } = req.body_json().await?;
 
     if !csp_report.is_in_block_list() {
-        let to_name = env::var("TO_NAME").unwrap();
-        let to_email = env::var("TO_EMAIL").unwrap();
+        let to_name = env::var("MORBO_TO_NAME").unwrap();
+        let to_email = env::var("MORBO_TO_EMAIL").unwrap();
 
-        let smtp_hostname = env::var("SMTP_HOSTNAME").unwrap();
-        let smtp_port = env::var("SMTP_PORT").unwrap().parse().unwrap();
-        let smtp_username = env::var("SMTP_USERNAME").unwrap();
-        let smtp_password = env::var("SMTP_PASSWORD").unwrap();
+        let smtp_hostname = env::var("MORBO_SMTP_HOSTNAME").unwrap();
+        let smtp_port = env::var("MORBO_SMTP_PORT").unwrap().parse().unwrap();
+        let smtp_username = env::var("MORBO_SMTP_USERNAME").unwrap();
+        let smtp_password = env::var("MORBO_SMTP_PASSWORD").unwrap();
 
         let mailer_configuration = MailerConfiguration {
             smtp_hostname,

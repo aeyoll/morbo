@@ -1,5 +1,5 @@
 [package]
-name = "cspreport"
+name = "morbo"
 version = "0.1.0"
 authors = ["Jean-Philippe Bidegain <jp@bidega.in>"]
 edition = "2018"
