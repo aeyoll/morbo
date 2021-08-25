@@ -33,7 +33,7 @@ impl fmt::Display for FilterCategory {
     }
 }
 
-pub const SOURCE_FILE_FILTERS: &'static [&'static str] = &[
+pub const SOURCE_FILE_FILTERS: &[&str] = &[
     "chromenull://",
     "resource://",
     "chrome-extension://",
@@ -58,7 +58,7 @@ pub const SOURCE_FILE_FILTERS: &'static [&'static str] = &[
     "static.hotjar.com",
 ];
 
-pub const BLOCKED_URI_FILTERS: &'static [&'static str] = &[
+pub const BLOCKED_URI_FILTERS: &[&str] = &[
     "mxjscall://",
     "res://",
     "safari-resource://",
@@ -240,7 +240,7 @@ pub const BLOCKED_URI_FILTERS: &'static [&'static str] = &[
     "gj.track.uc.cn",
 ];
 
-pub const SCRIPT_SAMPLE_FILTERS: &'static [&'static str] = &[
+pub const SCRIPT_SAMPLE_FILTERS: &[&str] = &[
     ";(function installGlobalHook(window)",
     "var FuckAdBlock = function",
     "var BlockAdBlock = function",
@@ -336,7 +336,7 @@ pub const SCRIPT_SAMPLE_FILTERS: &'static [&'static str] = &[
     "Date.prefs =",
 ];
 
-pub const REFERRER_FILTERS: &'static [&'static str] = &[
+pub const REFERRER_FILTERS: &[&str] = &[
     "http://l.facebook.com",
     "https://l.facebook.com",
     "feedly.com",
@@ -351,4 +351,4 @@ pub const REFERRER_FILTERS: &'static [&'static str] = &[
     "&source=hangouts",
 ];
 
-pub const ORIGINAL_POLICY_FILTERS: &'static [&'static str] = &[".blackspider.com"];
+pub const ORIGINAL_POLICY_FILTERS: &[&str] = &[".blackspider.com"];

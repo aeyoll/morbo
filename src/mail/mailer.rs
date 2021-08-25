@@ -1,5 +1,5 @@
 use crate::csp::csp_report_content::CspReportContent;
-use crate::mailer::mailer_configuration::MailerConfiguration;
+use crate::mail::mailer_configuration::MailerConfiguration;
 use anyhow::Error;
 use lettre::smtp::authentication::{Credentials, Mechanism};
 use lettre::smtp::error::SmtpResult;

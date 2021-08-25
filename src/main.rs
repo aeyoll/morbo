@@ -6,15 +6,15 @@ extern crate clap;
 use clap::App;
 
 pub mod csp;
-pub mod mailer;
+pub mod mail;
 
 extern crate dotenv;
 use dotenv::dotenv;
 use std::env;
 
 use crate::csp::csp_report::CspReport;
-use crate::mailer::mailer::Mailer;
-use crate::mailer::mailer_configuration::MailerConfiguration;
+use crate::mail::mailer::Mailer;
+use crate::mail::mailer_configuration::MailerConfiguration;
 
 #[async_std::main]
 async fn main() -> tide::Result<()> {

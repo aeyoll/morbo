@@ -61,37 +61,32 @@ pub struct CspReportContent {
 impl CspReportContent {
     fn is_in_blocked_uri_filters(&self) -> bool {
         BLOCKED_URI_FILTERS
-            .into_iter()
-            .find(|&&x| x == self.blocked_uri)
-            .is_some()
+            .iter()
+            .any(|x| *x == self.blocked_uri)
     }
 
     fn is_in_original_policy_filters(&self) -> bool {
         ORIGINAL_POLICY_FILTERS
-            .into_iter()
-            .find(|&&x| x == self.original_policy)
-            .is_some()
+            .iter()
+            .any(|x| *x == self.original_policy)
     }
 
     fn is_in_referrer_filters(&self) -> bool {
         REFERRER_FILTERS
-            .into_iter()
-            .find(|&&x| x == self.referrer)
-            .is_some()
+            .iter()
+            .any(|x| *x == self.referrer)
     }
 
     fn is_in_script_sample_filters(&self) -> bool {
         SCRIPT_SAMPLE_FILTERS
-            .into_iter()
-            .find(|&&x| self.script_sample.is_some() && x == self.script_sample.as_ref().unwrap())
-            .is_some()
+            .iter()
+            .any(|x| self.script_sample.is_some() && *x == self.script_sample.as_ref().unwrap())
     }
 
     fn is_in_source_file_filters(&self) -> bool {
         SOURCE_FILE_FILTERS
-            .into_iter()
-            .find(|&&x| self.source_file.is_some() && x == self.source_file.as_ref().unwrap())
-            .is_some()
+            .iter()
+            .any(|x| self.source_file.is_some() && *x == self.source_file.as_ref().unwrap())
     }
 
     pub fn is_in_block_list(&self) -> bool {
