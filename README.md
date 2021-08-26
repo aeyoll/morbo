@@ -23,6 +23,8 @@ cargo install morbo
 Then, setup some environment variables:
 
 ```
+MORBO_FROM_NAME=Example
+MORBO_FROM_EMAIL=example@example.org
 MORBO_TO_NAME=Example
 MORBO_TO_EMAIL=example@example.org
 MORBO_SMTP_HOSTNAME=localhost
