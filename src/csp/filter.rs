@@ -1,4 +1,4 @@
-/// Init some filters from some of the report you might receive.
+/// Init some filters, usefull to exlude some of the reports you might receive.
 /// This is basically false positives, or browser extension causing some trouble.
 /// Shamelessly taken from <https://github.com/nico3333fr/CSP-useful/tree/master/csp-wtf>
 
