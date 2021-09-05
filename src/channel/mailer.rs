@@ -59,15 +59,15 @@ impl Mailer {
 
 impl Channel<SmtpResult> for Mailer {
     fn load_from_env() -> Self {
-        let from_name = env::var("MORBO_FROM_NAME").unwrap();
-        let from_email = env::var("MORBO_FROM_EMAIL").unwrap();
-        let to_name = env::var("MORBO_TO_NAME").unwrap();
-        let to_email = env::var("MORBO_TO_EMAIL").unwrap();
+        let from_name = env::var("MORBO_MAILER_FROM_NAME").unwrap();
+        let from_email = env::var("MORBO_MAILER_FROM_EMAIL").unwrap();
+        let to_name = env::var("MORBO_MAILER_TO_NAME").unwrap();
+        let to_email = env::var("MORBO_MAILER_TO_EMAIL").unwrap();
 
-        let smtp_hostname = env::var("MORBO_SMTP_HOSTNAME").unwrap();
-        let smtp_port = env::var("MORBO_SMTP_PORT").unwrap().parse().unwrap();
-        let smtp_username = env::var("MORBO_SMTP_USERNAME").unwrap();
-        let smtp_password = env::var("MORBO_SMTP_PASSWORD").unwrap();
+        let smtp_hostname = env::var("MORBO_MAILER_SMTP_HOSTNAME").unwrap();
+        let smtp_port = env::var("MORBO_MAILER_SMTP_PORT").unwrap().parse().unwrap();
+        let smtp_username = env::var("MORBO_MAILER_SMTP_USERNAME").unwrap();
+        let smtp_password = env::var("MORBO_MAILER_SMTP_PASSWORD").unwrap();
 
         Mailer {
             from_name,
