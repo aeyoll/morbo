@@ -6,9 +6,11 @@ extern crate clap;
 use clap::App;
 
 pub mod csp;
+pub mod channel;
 
 #[cfg(feature = "mail")]
 pub mod mail;
+
 #[cfg(feature = "mail")]
 use crate::mail::mailer::Mailer;
 
@@ -16,6 +18,7 @@ extern crate dotenv;
 use dotenv::dotenv;
 
 use crate::csp::csp_report::CspReport;
+use crate::channel::channel::Channel;
 
 #[async_std::main]
 async fn main() -> tide::Result<()> {
