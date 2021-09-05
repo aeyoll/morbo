@@ -14,10 +14,12 @@ This Rust crate is an endpoint to receive those reports and send them to an emai
 Install
 ---
 
-First, install using cargo:
+First, install using cargo. You must choose the channels you want to receive notifications on, using the `--features` command line arg.
+
+`mail` and `sentry` are currently available.
 
 ```
-cargo install morbo
+cargo install morbo --features=mail,sentry
 ```
 
 Then, setup some environment variables:
