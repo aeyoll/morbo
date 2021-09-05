@@ -18,6 +18,8 @@ extern crate dotenv;
 use dotenv::dotenv;
 
 use crate::csp::csp_report::CspReport;
+
+#[cfg(any(feature = "mail", feature = "sentry"))]
 use crate::channel::channel::Channel;
 
 #[async_std::main]
