@@ -9,10 +9,7 @@ pub mod csp;
 pub mod channel;
 
 #[cfg(feature = "mail")]
-pub mod mail;
-
-#[cfg(feature = "mail")]
-use crate::mail::mailer::Mailer;
+use channel::mailer::Mailer;
 
 extern crate dotenv;
 use dotenv::dotenv;
