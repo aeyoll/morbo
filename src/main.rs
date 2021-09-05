@@ -11,6 +11,9 @@ pub mod channel;
 #[cfg(feature = "mail")]
 use channel::mailer::Mailer;
 
+#[cfg(feature = "sentry")]
+use channel::sentry::Sentry;
+
 extern crate dotenv;
 use dotenv::dotenv;
 
@@ -55,6 +58,12 @@ async fn csp_report_action(mut req: Request<()>) -> tide::Result {
         let _ = || {
             let mailer = Mailer::load_from_env();
             let _res = mailer.send_report(&csp_report).unwrap();
+        };
+
+        #[cfg(feature = "sentry")]
+        let _ = || {
+            let sentry = Sentry::load_from_env();
+            let _res = sentry.send_report(&csp_report).unwrap();
         };
 
         Ok(format!(

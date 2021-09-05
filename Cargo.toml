@@ -19,6 +19,8 @@ anyhow = "1.0"
 enum-utils = "0.1.2"
 lettre = {version = "0.9", optional = true }
 lettre_email = {version = "0.9", optional = true }
+sentry_core = {version = "0.23", optional = true, package = "sentry" }
 
 [features]
 mail = ["lettre", "lettre_email"]
+sentry = ["sentry_core"]
