@@ -46,12 +46,12 @@ impl Mailer {
         Ok(transport)
     }
 
-    pub fn send_report(
-        &self,
-        report: &CspReportContent,
-    ) -> Result<SmtpResult, Error> {
+    pub fn send_report(&self, report: &CspReportContent) -> Result<SmtpResult, Error> {
         let email = EmailBuilder::new()
-            .from((&self.configuration.from_email, &self.configuration.from_name))
+            .from((
+                &self.configuration.from_email,
+                &self.configuration.from_name,
+            ))
             .to((&self.configuration.to_email, &self.configuration.to_name))
             .subject("[CSP] New report")
             .body(format!(

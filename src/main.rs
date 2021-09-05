@@ -6,15 +6,18 @@ extern crate clap;
 use clap::App;
 
 pub mod csp;
+
+#[cfg(feature = "mail")]
 pub mod mail;
+#[cfg(feature = "mail")]
+use crate::mail::mailer::Mailer;
+#[cfg(feature = "mail")]
+use crate::mail::mailer_configuration::MailerConfiguration;
 
 extern crate dotenv;
 use dotenv::dotenv;
-use std::env;
 
 use crate::csp::csp_report::CspReport;
-use crate::mail::mailer::Mailer;
-use crate::mail::mailer_configuration::MailerConfiguration;
 
 #[async_std::main]
 async fn main() -> tide::Result<()> {
@@ -50,32 +53,16 @@ async fn csp_report_action(mut req: Request<()>) -> tide::Result {
     let CspReport { csp_report } = req.body_json().await?;
 
     if !csp_report.is_in_block_list() {
-        let from_name = env::var("MORBO_FROM_NAME").unwrap();
-        let from_email = env::var("MORBO_FROM_EMAIL").unwrap();
-        let to_name = env::var("MORBO_TO_NAME").unwrap();
-        let to_email = env::var("MORBO_TO_EMAIL").unwrap();
+        #[cfg(feature = "mail")]
+        let _ = || {
+            let mailer_configuration = MailerConfiguration::load_from_env();
 
-        let smtp_hostname = env::var("MORBO_SMTP_HOSTNAME").unwrap();
-        let smtp_port = env::var("MORBO_SMTP_PORT").unwrap().parse().unwrap();
-        let smtp_username = env::var("MORBO_SMTP_USERNAME").unwrap();
-        let smtp_password = env::var("MORBO_SMTP_PASSWORD").unwrap();
+            let mailer = Mailer {
+                configuration: mailer_configuration,
+            };
 
-        let mailer_configuration = MailerConfiguration {
-            from_name,
-            from_email,
-            to_name,
-            to_email,
-            smtp_hostname,
-            smtp_port,
-            smtp_username: Some(smtp_username),
-            smtp_password: Some(smtp_password),
+            let _res = mailer.send_report(&csp_report).unwrap();
         };
-
-        let mailer = Mailer {
-            configuration: mailer_configuration,
-        };
-
-        let _res = mailer.send_report(&csp_report)?;
 
         Ok(format!(
             "CSP report: {}",
