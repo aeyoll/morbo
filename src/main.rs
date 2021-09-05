@@ -11,8 +11,6 @@ pub mod csp;
 pub mod mail;
 #[cfg(feature = "mail")]
 use crate::mail::mailer::Mailer;
-#[cfg(feature = "mail")]
-use crate::mail::mailer_configuration::MailerConfiguration;
 
 extern crate dotenv;
 use dotenv::dotenv;
@@ -55,12 +53,7 @@ async fn csp_report_action(mut req: Request<()>) -> tide::Result {
     if !csp_report.is_in_block_list() {
         #[cfg(feature = "mail")]
         let _ = || {
-            let mailer_configuration = MailerConfiguration::load_from_env();
-
-            let mailer = Mailer {
-                configuration: mailer_configuration,
-            };
-
+            let mailer = Mailer::load_from_env();
             let _res = mailer.send_report(&csp_report).unwrap();
         };
 
