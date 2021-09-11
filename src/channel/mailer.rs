@@ -9,6 +9,7 @@ use lettre_email::EmailBuilder;
 use lettre::Transport;
 use std::env;
 
+/// Mailer channel
 pub struct Mailer {
     pub from_name: String,
     pub from_email: String,

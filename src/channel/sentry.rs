@@ -5,6 +5,7 @@ use std::env;
 use crate::channel::channel::Channel;
 use sentry_core::types::Uuid;
 
+/// Sentry channel
 pub struct Sentry {
     pub dsn: String,
 }
