@@ -1,9 +1,9 @@
-use crate::csp::csp_report_content::CspReportContent;
-use sentry_core;
-use anyhow::Error;
-use std::env;
 use crate::channel::channel::Channel;
+use crate::csp::csp_report_content::CspReportContent;
+use anyhow::Error;
+use sentry_core;
 use sentry_core::types::Uuid;
+use std::env;
 
 /// Sentry channel
 pub struct Sentry {
@@ -22,6 +22,9 @@ impl Channel<Uuid> for Sentry {
         let _guard = sentry_core::init(dsn);
         let report = serde_json::to_string_pretty(report).unwrap();
 
-        Ok(sentry_core::capture_message(&*report, sentry_core::Level::Info))
+        Ok(sentry_core::capture_message(
+            &*report,
+            sentry_core::Level::Info,
+        ))
     }
 }

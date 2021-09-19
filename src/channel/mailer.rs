@@ -25,27 +25,15 @@ pub struct Mailer {
 
 impl Mailer {
     pub fn get_transport(&self) -> Result<SmtpTransport, Error> {
-        let addr = (
-            self.smtp_hostname.as_str(),
-            self.smtp_port,
-        );
+        let addr = (self.smtp_hostname.as_str(), self.smtp_port);
         let security = ClientSecurity::None;
 
         let mut smtp_client = SmtpClient::new(addr, security)?;
 
-        if self.smtp_username.is_some() && self.smtp_password.is_some()
-        {
+        if self.smtp_username.is_some() && self.smtp_password.is_some() {
             let credentials = Credentials::new(
-                self
-                    .smtp_username
-                    .as_ref()
-                    .unwrap()
-                    .to_owned(),
-                self
-                    .smtp_password
-                    .as_ref()
-                    .unwrap()
-                    .to_owned(),
+                self.smtp_username.as_ref().unwrap().to_owned(),
+                self.smtp_password.as_ref().unwrap().to_owned(),
             );
 
             smtp_client = smtp_client
@@ -84,10 +72,7 @@ impl Channel<SmtpResult> for Mailer {
 
     fn send_report(&self, report: &CspReportContent) -> Result<SmtpResult, Error> {
         let email = EmailBuilder::new()
-            .from((
-                &self.from_email,
-                &self.from_name,
-            ))
+            .from((&self.from_email, &self.from_name))
             .to((&self.to_email, &self.to_name))
             .subject("[CSP] New report")
             .body(format!(

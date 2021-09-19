@@ -5,8 +5,8 @@ use tide::{Request, StatusCode};
 extern crate clap;
 use clap::App;
 
-pub mod csp;
 pub mod channel;
+pub mod csp;
 
 #[cfg(feature = "mail")]
 use channel::mailer::Mailer;
