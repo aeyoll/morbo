@@ -56,14 +56,14 @@ async fn csp_report_action(mut req: Request<()>) -> tide::Result {
     let CspReport { csp_report } = req.body_json().await?;
 
     if !csp_report.is_in_block_list() {
-        #[cfg(feature = "mail")]
-        let _ = || {
+        #[cfg(feature = "mail")] {
+            println!("Sending report by email");
             let mailer = Mailer::load_from_env();
             let _res = mailer.send_report(&csp_report).unwrap();
         };
 
-        #[cfg(feature = "sentry")]
-        let _ = || {
+        #[cfg(feature = "sentry")] {
+            println!("Sending report to sentry");
             let sentry = Sentry::load_from_env();
             let _res = sentry.send_report(&csp_report).unwrap();
         };
