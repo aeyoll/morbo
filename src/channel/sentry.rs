@@ -20,10 +20,12 @@ impl Channel<Uuid> for Sentry {
     fn send_report(&self, report: &CspReportContent) -> Result<Uuid, Error> {
         let dsn = self.dsn.as_str();
         let _guard = sentry_core::init(dsn);
-        let report = serde_json::to_string_pretty(report).unwrap();
+        let json_report = serde_json::to_string_pretty(report).unwrap();
+
+        let message = format!("CSP alert from {}\n{}", report.document_uri, json_report);
 
         Ok(sentry_core::capture_message(
-            &*report,
+            &*message,
             sentry_core::Level::Info,
         ))
     }
