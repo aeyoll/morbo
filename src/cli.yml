@@ -9,3 +9,11 @@ args:
         value_name: PORT
         help: Running port
         takes_value: true
+    - verbose:
+        long: verbose
+        short: v
+        help: "Be verbose during process"
+    - debug:
+        short: d
+        long: debug
+        help: "Print additionals debug informations"

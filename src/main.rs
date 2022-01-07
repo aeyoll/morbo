@@ -1,5 +1,6 @@
 use tide::security::{CorsMiddleware, Origin};
 use tide::{Request, StatusCode};
+use tide::log;
 
 #[macro_use]
 extern crate clap;
@@ -31,9 +32,19 @@ async fn main() -> tide::Result<()> {
     let yaml = load_yaml!("cli.yml");
     let matches = App::from_yaml(yaml).get_matches();
 
+    if matches.is_present("debug") {
+        log::with_level(log::LevelFilter::Debug);
+    } else if matches.is_present("verbose") {
+        log::with_level(log::LevelFilter::Info);
+    } else {
+        log::with_level(log::LevelFilter::Warn);
+    }
+
     let port = matches.value_of("port").unwrap_or("8080");
     let binding = format!("127.0.0.1:{}", port);
-    println!("Launching server on {}", binding);
+    log::info!("Launching server on {}", binding);
+    let vars: Vec<(String, String)> = dotenv::vars().filter(|x| x.0.starts_with("MORBO_")).collect();
+    log::debug!("environment: {:?}", vars);
 
     let mut app = tide::new();
 
@@ -53,18 +64,18 @@ async fn main() -> tide::Result<()> {
 }
 
 async fn csp_report_action(mut req: Request<()>) -> tide::Result {
-    println!("Received a new report");
+    log::info!("Received a new report");
     let CspReport { csp_report } = req.body_json().await?;
 
     if !csp_report.is_in_block_list() {
         #[cfg(feature = "mail")] {
-            println!("Sending report by email");
+            log::debug!("Sending report by email");
             let mailer = Mailer::load_from_env();
             let _res = mailer.send_report(&csp_report).unwrap();
         };
 
         #[cfg(feature = "sentry")] {
-            println!("Sending report to sentry");
+            log::debug!("Sending report to sentry");
             let sentry = Sentry::load_from_env();
             let _res = sentry.send_report(&csp_report).unwrap();
         };
