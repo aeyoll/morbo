@@ -53,6 +53,7 @@ async fn main() -> tide::Result<()> {
 }
 
 async fn csp_report_action(mut req: Request<()>) -> tide::Result {
+    println!("Received a new report");
     let CspReport { csp_report } = req.body_json().await?;
 
     if !csp_report.is_in_block_list() {
