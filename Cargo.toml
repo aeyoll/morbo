@@ -1,6 +1,6 @@
 [package]
 name = "morbo"
-version = "0.1.3"
+version = "0.2.0"
 authors = ["Jean-Philippe Bidegain <jp@bidega.in>"]
 edition = "2021"
 description = "A CSP Reporter"
