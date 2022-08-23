@@ -1,7 +1,8 @@
 use std::net::SocketAddr;
 
-pub mod channel;
-pub mod csp;
+mod args;
+mod channel;
+mod csp;
 
 use axum::http::{HeaderValue, Method};
 use axum::{http::StatusCode, response::IntoResponse, routing::post, Json, Router};
@@ -20,17 +21,10 @@ use crate::csp::csp_report::CspReport;
 #[cfg(any(feature = "mail", feature = "sentry"))]
 use crate::channel::channel::Channel;
 
-use clap::Parser;
-
 use tower_http::cors::CorsLayer;
 
-#[derive(Parser, Debug)]
-#[clap(author, version, about, long_about = None)]
-struct Args {
-    /// Running port
-    #[clap(short, long, value_parser, default_value_t = 8080)]
-    port: u16,
-}
+use crate::args::Args;
+use clap::Parser;
 
 #[tokio::main]
 async fn main() {
