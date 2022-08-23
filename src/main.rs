@@ -1,13 +1,10 @@
-use tide::security::{CorsMiddleware, Origin};
-use tide::{Request, StatusCode};
-use tide::log;
-
-#[macro_use]
-extern crate clap;
-use clap::App;
+use std::net::SocketAddr;
 
 pub mod channel;
 pub mod csp;
+
+use axum::http::{HeaderValue, Method};
+use axum::{http::StatusCode, response::IntoResponse, routing::post, Json, Router};
 
 #[cfg(feature = "mail")]
 use channel::mailer::Mailer;
@@ -23,49 +20,59 @@ use crate::csp::csp_report::CspReport;
 #[cfg(any(feature = "mail", feature = "sentry"))]
 use crate::channel::channel::Channel;
 
-#[async_std::main]
-async fn main() -> tide::Result<()> {
+use clap::Parser;
+
+use tower_http::cors::CorsLayer;
+
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
+struct Args {
+    /// Running port
+    #[clap(short, long, value_parser, default_value_t = 8080)]
+    port: u16,
+}
+
+#[tokio::main]
+async fn main() {
     // Load env variables
     dotenv().ok();
 
     // Cli args
-    let yaml = load_yaml!("cli.yml");
-    let matches = App::from_yaml(yaml).get_matches();
+    let args = Args::parse();
 
-    if matches.is_present("debug") {
+    if args.is_present("debug") {
         log::with_level(log::LevelFilter::Debug);
-    } else if matches.is_present("verbose") {
+    } else if args.is_present("verbose") {
         log::with_level(log::LevelFilter::Info);
     } else {
         log::with_level(log::LevelFilter::Warn);
     }
 
-    let port = matches.value_of("port").unwrap_or("8080");
-    let binding = format!("127.0.0.1:{}", port);
-    log::info!("Launching server on {}", binding);
-    let vars: Vec<(String, String)> = dotenv::vars().filter(|x| x.0.starts_with("MORBO_")).collect();
-    log::debug!("environment: {:?}", vars);
+    // initialize tracing
+    tracing_subscriber::fmt::init();
 
-    let mut app = tide::new();
+    // App initialisation
+    let app = Router::new()
+        .route("/_/csp-reports", post(csp_report_action))
+        .layer(
+            CorsLayer::new()
+                .allow_methods([Method::GET, Method::POST, Method::PUT, Method::OPTIONS])
+                .allow_origin("*".parse::<HeaderValue>().unwrap())
+                .allow_credentials(false),
+        );
 
-    let cors = CorsMiddleware::new()
-        .allow_methods(
-            "GET, POST, PUT, OPTIONS"
-                .parse::<tide::http::headers::HeaderValue>()
-                .unwrap(),
-        )
-        .allow_origin(Origin::from("*"))
-        .allow_credentials(false);
-    app.with(cors);
-
-    app.at("/_/csp-reports").post(csp_report_action);
-    app.listen(&binding).await?;
-    Ok(())
+    // Run it
+    let port: u16 = args.port;
+    let addr = SocketAddr::from(([127, 0, 0, 1], port));
+    tracing::debug!("listening on {}", addr);
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
 
-async fn csp_report_action(mut req: Request<()>) -> tide::Result {
-    log::info!("Received a new report");
-    let CspReport { csp_report } = req.body_json().await?;
+async fn csp_report_action(Json(payload): Json<CspReport>) -> impl IntoResponse {
+    let csp_report = payload.csp_report;
 
     if !csp_report.is_in_block_list() {
         #[cfg(feature = "mail")] {
@@ -79,13 +86,7 @@ async fn csp_report_action(mut req: Request<()>) -> tide::Result {
             let sentry = Sentry::load_from_env();
             let _res = sentry.send_report(&csp_report).unwrap();
         };
-
-        Ok(format!(
-            "CSP report: {}",
-            serde_json::to_string_pretty(&csp_report).unwrap()
-        )
-        .into())
-    } else {
-        Err(tide::Error::from_str(StatusCode::Forbidden, ""))
     }
+
+    (StatusCode::OK, Json(""))
 }

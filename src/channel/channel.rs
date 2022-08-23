@@ -1,7 +1,7 @@
 use crate::csp::csp_report_content::CspReportContent;
 use anyhow::Error;
 
-/// A channel represent's how a CSP report is sent
+/// A channel represents how a CSP report is sent
 pub trait Channel<T> {
     /// Construct a channel from environment variables
     fn load_from_env() -> Self;
