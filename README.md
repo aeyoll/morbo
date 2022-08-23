@@ -1,9 +1,9 @@
 # Morbo, a CSP Reporter
 
 [![LICENSE](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Build Status](https://github.com/aeyoll/morbo/actions/workflows/rust.yml/badge.svg)](https://github.com/aeyoll/morbo/actions/workflows/ci.yml)
+[![Build Status](https://github.com/aeyoll/morbo/actions/workflows/ci.yml/badge.svg)](https://github.com/aeyoll/morbo/actions/workflows/ci.yml)
 [![Crates.io Version](https://img.shields.io/crates/v/morbo.svg)](https://crates.io/crates/morbo)
-[![Minimum rustc version](https://img.shields.io/badge/rustc-1.48.0+-lightgray.svg)](#rust-version-requirements)
+[![Minimum rustc version](https://img.shields.io/badge/rustc-1.49.0+-lightgray.svg)](#rust-version-requirements)
 
 ![Morbo, a CSP Reporter](https://github.com/aeyoll/morbo/blob/main/.github/logo.jpg?raw=true)
 
@@ -60,3 +60,8 @@ Content-Security-Policy: default-src 'self'; report-to csp-endpoint; report-uri 
 ```
 
 Event though `report-uri` is deprecated, `report-to` is not supported in every browser.
+
+Rust version requirements
+---
+
+Rust >= 1.49.0+
