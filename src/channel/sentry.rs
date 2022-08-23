@@ -1,4 +1,4 @@
-use crate::channel::channel::Channel;
+use crate::channel::Channel;
 use crate::csp::csp_report_content::CspReportContent;
 use anyhow::Error;
 use sentry_core;

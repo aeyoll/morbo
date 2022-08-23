@@ -1,4 +1,4 @@
-use tide::prelude::*;
+use serde::{Deserialize, Serialize};
 
 use crate::csp::filter::{
     BLOCKED_URI_FILTERS, ORIGINAL_POLICY_FILTERS, REFERRER_FILTERS, SCRIPT_SAMPLE_FILTERS,

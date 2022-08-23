@@ -1,4 +1,3 @@
-use crate::channel::channel::Channel;
 use crate::csp::csp_report_content::CspReportContent;
 use anyhow::Error;
 use lettre::smtp::authentication::{Credentials, Mechanism};
@@ -6,6 +5,7 @@ use lettre::smtp::error::SmtpResult;
 use lettre::{ClientSecurity, SmtpClient, SmtpTransport};
 use lettre_email::EmailBuilder;
 
+use crate::channel::Channel;
 use lettre::Transport;
 use std::env;
 

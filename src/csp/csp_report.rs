@@ -1,7 +1,7 @@
 use crate::csp::csp_report_content::CspReportContent;
-use tide::prelude::*;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CspReport {
     #[serde(alias = "csp-report")]
     pub csp_report: CspReportContent,
