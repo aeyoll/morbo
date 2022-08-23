@@ -19,7 +19,7 @@ use dotenv::dotenv;
 use crate::csp::csp_report::CspReport;
 
 #[cfg(any(feature = "mail", feature = "sentry"))]
-use crate::channel::channel::Channel;
+use crate::channel::Channel;
 
 use tower_http::cors::CorsLayer;
 

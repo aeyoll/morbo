@@ -1,4 +1,3 @@
-use crate::channel::channel::Channel;
 use crate::csp::csp_report_content::CspReportContent;
 use anyhow::Error;
 use lettre::smtp::authentication::{Credentials, Mechanism};
@@ -8,6 +7,7 @@ use lettre_email::EmailBuilder;
 
 use lettre::Transport;
 use std::env;
+use crate::channel::Channel;
 
 /// Mailer channel
 pub struct Mailer {
