@@ -1,9 +1,9 @@
+use crate::channel::Channel;
 use crate::csp::csp_report_content::CspReportContent;
 use anyhow::Error;
 use sentry_core;
 use sentry_core::types::Uuid;
 use std::env;
-use crate::channel::Channel;
 
 /// Sentry channel
 pub struct Sentry {

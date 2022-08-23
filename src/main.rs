@@ -25,6 +25,9 @@ use tower_http::cors::CorsLayer;
 
 use crate::args::Args;
 use clap::Parser;
+use tracing::Level;
+use tracing::log::debug;
+use tracing_subscriber::FmtSubscriber;
 
 #[tokio::main]
 async fn main() {
@@ -34,16 +37,17 @@ async fn main() {
     // Cli args
     let args = Args::parse();
 
-    if args.is_present("debug") {
-        log::with_level(log::LevelFilter::Debug);
-    } else if args.is_present("verbose") {
-        log::with_level(log::LevelFilter::Info);
-    } else {
-        log::with_level(log::LevelFilter::Warn);
+    // initialize tracing
+    let mut max_level = Level::WARN;
+
+    if args.debug {
+        max_level = Level::DEBUG;
+    } else if args.verbose {
+        max_level = Level::INFO;
     }
 
-    // initialize tracing
-    tracing_subscriber::fmt::init();
+    let subscriber = FmtSubscriber::builder().with_max_level(max_level).finish();
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
     // App initialisation
     let app = Router::new()
@@ -58,7 +62,7 @@ async fn main() {
     // Run it
     let port: u16 = args.port;
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
-    tracing::debug!("listening on {}", addr);
+    debug!("listening on {}", addr);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await
@@ -69,14 +73,16 @@ async fn csp_report_action(Json(payload): Json<CspReport>) -> impl IntoResponse 
     let csp_report = payload.csp_report;
 
     if !csp_report.is_in_block_list() {
-        #[cfg(feature = "mail")] {
-            log::debug!("Sending report by email");
+        #[cfg(feature = "mail")]
+        {
+            debug!("Sending report by email");
             let mailer = Mailer::load_from_env();
             let _res = mailer.send_report(&csp_report).unwrap();
         };
 
-        #[cfg(feature = "sentry")] {
-            log::debug!("Sending report to sentry");
+        #[cfg(feature = "sentry")]
+        {
+            debug!("Sending report to sentry");
             let sentry = Sentry::load_from_env();
             let _res = sentry.send_report(&csp_report).unwrap();
         };

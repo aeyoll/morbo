@@ -5,9 +5,9 @@ use lettre::smtp::error::SmtpResult;
 use lettre::{ClientSecurity, SmtpClient, SmtpTransport};
 use lettre_email::EmailBuilder;
 
+use crate::channel::Channel;
 use lettre::Transport;
 use std::env;
-use crate::channel::Channel;
 
 /// Mailer channel
 pub struct Mailer {
